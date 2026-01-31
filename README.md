@@ -1,0 +1,2 @@
+# 🌊 FlowClock
+FlowClock is an app that connects your to-do list with a timer, aiming to help you get into your daily focus flow. You will also get a log of your tasks + time if you would want to analyze where your attention goes everyday for reflection and future improvements.
