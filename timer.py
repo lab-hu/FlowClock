@@ -1,88 +1,105 @@
 import time
 import csv
 import os
+import subprocess
 from datetime import datetime
 
 class Task:
-    def __init__(self, name, duration_mins):
+    def __init__(self, name, category, estimated_mins):
         self.name = name
-        self.duration_mins = duration_mins
-        self.completed = False  
-        self.notes = ""         
+        self.category = category  # New: School, Work, Side Project, etc.
+        self.estimated_mins = estimated_mins
+        self.actual_mins = 0  
+        self.completed = False
+        self.notes = ""        
 
 def get_user_tasks():
     tasks_list = []
-    print("--- Define your workday tasks ---")
+    print("--- 🌊 FlowClock v2.5: Define Your Day ---")
     while True:
-        name = input("Task name (or type 'done' to finish): ")
+        name = input("\nTask name (or type 'done' to finish): ")
         if name.lower() == 'done':
             break
+        
+        # New: Category prompt for better dashboarding later
+        print("Categories: [S]chool, [W]ork, [P]roject, [A]dmin, [H]ealth")
+        cat_input = input(f"Category for '{name}': ").upper()
+        
         try:
-            mins = int(input(f"How many minutes for '{name}'? "))
-            tasks_list.append(Task(name, mins))
+            mins = int(input(f"Estimated minutes for '{name}': "))
+            tasks_list.append(Task(name, cat_input, mins))
         except ValueError:
             print("Oops! Please enter a whole number for minutes.")
     return tasks_list
 
 def run_timer(task):
-    seconds = task.duration_mins * 60
-    print(f"\n>>> Starting: {task.name}")
+    sound_high = "/System/Library/Sounds/Glass.aiff"
+    sound_low = "/System/Library/Sounds/Basso.aiff"
+    
+    seconds = task.estimated_mins * 60
+    print(f"\n>>> Starting: [{task.category}] {task.name} ({task.estimated_mins}m)")
+    
     while seconds > 0:
-        m, s = divmod(seconds, 60) # A shortcut for // and %
-        print(f"Time remaining: {m:02d}:{s:02d}", end="\r")
+        m, s = divmod(seconds, 60)
+        print(f"⏳ Countdown: {m:02d}:{s:02d}", end="\r")
         time.sleep(1)
         seconds -= 1
-    print(f"\nDone with {task.name}!")
-
-    alarm_sound = "/System/Library/Sounds/Funk.aiff"
     
-    # 2. The 5-second Loop
-    print("\n⏰ TIME IS UP!")
-    for _ in range(5):
-        os.system(f'afplay {alarm_sound}')
-        time.sleep(1)
+    task.actual_mins += task.estimated_mins 
+    
+    print(f"\n\n{'!'*25}\n⏰ TIME IS UP: {task.name.upper()}\n{'!'*25}")
+    
+    alarm_loop = subprocess.Popen(
+        ['/bin/bash', '-c', f'while true; do afplay -v 255 {sound_high} & afplay -v 255 {sound_low}; sleep 1; done']
+    )
 
-# NEW FUNCTION: The Guardrail
-def check_off_task(task):
-    while True:
-        status = input(f"Did you finish '{task.name}'? (y/n): ").lower()
-        if status == 'y':
+    input("👉 PRESS [ENTER] TO SILENCE ALARM...")
+    alarm_loop.terminate()
+
+    finished = input(f"\nDid you finish '{task.name}'? (y/n): ").lower()
+    
+    if finished != 'y':
+        print("🚀 Entering Overtime... Press Ctrl+C when finished!")
+        start_time = time.time() 
+        try:
+            while True:
+                elapsed = int(time.time() - start_time)
+                m, s = divmod(elapsed, 60)
+                total_so_far = round(task.actual_mins + (elapsed/60), 2)
+                print(f"⏱️ Overtime: {m:02d}:{s:02d} (Total: {total_so_far}m)", end="\r")
+                time.sleep(1)
+        except KeyboardInterrupt:
+            end_time = time.time()
+            actual_overtime_mins = (end_time - start_time) / 60
+            task.actual_mins += round(actual_overtime_mins, 2)
+            print(f"\n✅ Added {round(actual_overtime_mins, 2)}m.")
             task.completed = True
-            task.notes = input("Quick note on what you did: ")
-            break
-        else:
-            print("No problem! Keep working. Type 'y' when you are actually done.")
+    else:
+        task.completed = True
+
+    task.notes = input("Quick note/reflection: ")
 
 def save_results(tasks):
-    # Check if file exists so we know if we need to write the header
-    import os
     file_exists = os.path.isfile('work_log.csv')
-
     with open('work_log.csv', 'a', newline='') as file:
         writer = csv.writer(file)
         
-        # Write the header only once
+        # Updated header to include Category and clear up column confusion
         if not file_exists:
-            writer.writerow(["Date", "Task", "Minutes", "Completed", "Notes"])
+            writer.writerow(["Date", "Category", "Task", "Est_Mins", "Actual_Mins", "Completed", "Notes"])
         
-        # Get the current date and time
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
-        
         for t in tasks:
-            writer.writerow([timestamp, t.name, t.duration_mins, t.completed, t.notes])
+            writer.writerow([timestamp, t.category, t.name, t.estimated_mins, t.actual_mins, t.completed, t.notes])
             
-    print(f"\n✅ Progress saved to work_log.csv")
+    print(f"\n📊 Data saved. Your dashboard will look great with this!")
 
 def main():
-    # 1. Plan the day
     my_tasks = get_user_tasks()
-    
-    # 2. Execute the day
+    if not my_tasks: return
     for t in my_tasks:
         run_timer(t)
-        check_off_task(t) # Forces you to finish before the next timer starts
-        save_results(my_tasks)
-    print("\n🚀 All tasks for today are finished!")
+    save_results(my_tasks)
 
 if __name__ == "__main__":
     main()
