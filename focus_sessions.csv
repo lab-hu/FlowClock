@@ -1,0 +1,17 @@
+Date,Category,Task,Est_Mins,Actual_Mins,Completed,Notes,Focus_Level
+2026-02-03 17:21:00,Study,Mixed Model Notes,1,1.22,Yes,2 chapters,N/A
+2026-02-03 17:24:32,Work,flowclock,1,1.08,Yes,new version,5
+2026-02-03 17:30:11,Work,flowclock,3,3.08,Yes,version 4 is ready to go!,4
+2026-02-03 18:45:12,Work,Build Flow Clock,1,1.17,Yes,"built version 5, good stuff!",4
+2026-02-03 18:59:31,Study,Linear Algebra,1,1.17,Yes,Finished chapter 2,4
+2026-02-04 12:43:08,Study,Mixed Model Notes,180,237.28,Yes,Notes for chapter 9 and 10.,4
+2026-02-04 13:59:39,Personal,Rest,60,60.0,Yes,nice rest,1
+2026-02-04 14:27:03,Work,flowclock,1,1.0,Yes,test run,3
+2026-02-04 14:42:23,Work,flowclock,1,1.0,Yes,test,2
+2026-02-04 14:44:11,Study,flowclock,1,1.0,Yes,nice,2
+2026-02-04 15:11:24,Work,flowwork,1,1.12,Yes,fixed pause,3
+2026-02-04 15:20:36,Work,flowclock,1,1.05,Yes,nice,4
+2026-02-04 15:27:36,Work,flowclock,1,1.13,Yes,task 1,3
+2026-02-04 15:34:04,Work,flow,1,1.0,Yes,nice,2
+2026-02-04 16:42:58,Work,flowclock,1,1.0,Yes,flowclock 4,2
+2026-02-04 21:28:11,Work,flowclock entry,1,1.0,Yes,log?,4
