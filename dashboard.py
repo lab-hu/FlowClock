@@ -24,7 +24,7 @@ class DashboardWindow(ctk.CTkToplevel):
 
     def load_today_data(self):
         try:
-            df = pd.read_csv("test_sessions.csv")
+            df = pd.read_csv("focus_sessions.csv")
             today_str = datetime.now().strftime("%Y-%m-%d")
             today_data = df[df['Date'].str.contains(today_str)].copy()
             data_to_render = today_data if not today_data.empty else df
